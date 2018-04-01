@@ -1,8 +1,9 @@
 import log;
 import github;
+import db;
 
 log.init_log();
+db.connect_db();
 
-github.get_repos();
 
 log.close_log();

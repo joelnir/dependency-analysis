@@ -1,7 +1,7 @@
 import datetime;
 
 FILE_NAME = "dependency.log";
-log_file = 0;
+log_file = None;
 
 def init_log():
     global log_file;
