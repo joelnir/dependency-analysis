@@ -2,7 +2,6 @@ import requests;
 import log;
 
 MIN_STARS = 1000;
-SAMPLE_SIZE = 1000;
 
 def get_repos():
     base_query = 'https://api.github.com/search/repositories?q=language:javascript+stars:>' + str(MIN_STARS) + "&per_page=100";
