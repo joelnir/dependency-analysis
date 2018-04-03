@@ -1,5 +1,6 @@
 import requests;
 import log;
+import npm;
 
 MIN_STARS = 1000;
 
@@ -26,10 +27,46 @@ def get_repos():
         json_repos = json_data["items"];
 
         for json_repo in json_repos:
-            repo_obj = {"name": json_repo["name"], "url": json_repo["html_url"], "stars":json_repo["stargazers_count"]};
+            repo_obj = {"name": json_repo["name"], "url": json_repo["full_name"], "stars":json_repo["stargazers_count"]};
             repos.append(repo_obj);
             log.log(str(repo_obj));
 
         page_i += 1;
 
     return repos;
+
+"""
+
+"""
+def get_project_dependencies(url):
+    base_url = "https://raw.githubusercontent.com/{}/master/package.json"
+    filled_url = base_url.format(url);
+
+    response = requests.get(filled_url);
+
+    if(response.status_code == 404):
+        # package.json file not found
+        return False
+
+    json_data = response.json();
+
+    if("dependencies" in json_data):
+        deps = json_data["dependencies"];
+        decoded_deps = npm.decode_dependencies(deps);
+    else:
+        # No dependencies
+        decoded_deps = {"invalid": 0, "dependencies": []};
+
+    if("devDependencies" in json_data):
+        dev_deps = json_data["devDependencies"];
+        decoded_dev_deps = npm.decode_dependencies(dev_deps);
+    else:
+        # No dev-dependencies
+        decoded_dev_deps = {"invalid": 0, "dependencies": []};
+
+    dep_info = {
+        "dependencies": decoded_deps,
+        "dev_dependencies": decoded_dev_deps
+    }
+
+    return dep_info;

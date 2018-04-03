@@ -5,6 +5,21 @@ import json;
 """
 Get info about dependencies for a package name and version
 
+returns dict on same format as decode_dependencies
+"""
+def get_dependencies(name, version, data = "dependencies"):
+    # Split at every space on command line
+    commandLine = ["npm", "view", name + "@" + version, data, "--json"];
+
+    res = spc.run(commandLine, stdout=spc.PIPE);
+    json_str = res.stdout.decode("utf-8");
+    json_obj = json.loads(json_str);
+
+    return decode_dependencies(json_obj);
+
+"""
+Decode entire json object of dependencies
+
 returns dict on format:
 {
     "invalid": n,
@@ -15,22 +30,15 @@ returns dict on format:
     ]
 }
 """
-def get_dependencies(name, version, data = "dependencies"):
-    # Split at every space on command line
-    commandLine = ["npm", "view", name + "@" + version, data, "--json"];
-
-    res = spc.run(commandLine, stdout=spc.PIPE);
-    json_str = res.stdout.decode("utf-8");
-    json_obj = json.loads(json_str);
-
-    # Construct object to describe dependencies for given package
+def decode_dependencies(json_dict):
+    # Construct object to describe dependencies
     dependency_info = {
         "dependencies": [], # List of package name and versions dependent upon
         "invalid": 0 # Amount of invalid version lookups
     }
 
-    for name in json_obj.keys():
-        decoded_ver = decode_version(name, json_obj[name]);
+    for name in json_dict.keys():
+        decoded_ver = decode_version(name, json_dict[name]);
 
         if decoded_ver:
             dependency_info["dependencies"].append({"name": name, "version": decoded_ver});
