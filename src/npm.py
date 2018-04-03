@@ -4,6 +4,16 @@ import json;
 
 """
 Get info about dependencies for a package name and version
+
+returns dict on format:
+{
+    "invalid": n,
+    "dependencies": [
+        {"name:" "pkg1", "version": "1.2.3"},
+        ...,
+        {"name:" "pkgm", "version": "1.2.3"}
+    ]
+}
 """
 def get_dependencies(name, version, data = "dependencies"):
     # Split at every space on command line
