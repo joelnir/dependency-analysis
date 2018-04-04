@@ -2,19 +2,19 @@ import requests;
 import log;
 import npm;
 
-MIN_STARS = 1000;
+def get_repos(min_stars, max_stars):
+    base_query = "https://api.github.com/search/repositories?q=language:javascript+stars:{}..{}&per_page=100";
+    filled_query = base_query.format(str(min_stars), str(max_stars));
 
-def get_repos():
-    base_query = 'https://api.github.com/search/repositories?q=language:javascript+stars:>' + str(MIN_STARS) + "&per_page=100";
     repos = [];
-
 
     total_count = 101; # Total repos found through query (unknown until first query)
     page_i = 1;
 
-    while (total_count//100) >= page_i:
+    # Only 10 pages are available from github api
+    while (total_count//100) >= page_i and page_i < 10:
         log.log("Getting repos from page " + str(page_i));
-        query = base_query + "&page="+str(page_i);
+        query = filled_query + "&page="+str(page_i);
 
         response = requests.get(query);
         json_data = response.json();
@@ -22,14 +22,13 @@ def get_repos():
         if(page_i == 1):
             #Update total total_count
             total_count = json_data["total_count"];
-            log.log(str(total_count) + " total results from search");
+            log.log(str(total_count) + " total results from search " + query);
 
         json_repos = json_data["items"];
 
         for json_repo in json_repos:
             repo_obj = {"name": json_repo["name"], "url": json_repo["full_name"], "stars":json_repo["stargazers_count"]};
             repos.append(repo_obj);
-            log.log(str(repo_obj));
 
         page_i += 1;
 
