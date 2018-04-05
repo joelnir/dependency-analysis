@@ -2,7 +2,7 @@ import log;
 import sqlite3 as sqlite;
 
 DB_FILE_NAME = "db/database.db";
-SAMPLE_SIZE = 10;
+SAMPLE_SIZE = 1;
 
 db_con = None;
 
@@ -205,6 +205,10 @@ def get_project(project_id):
 Add to invalid count in sql db
 """
 def add_invalid(n):
+    if(n <= 0):
+        # No point in updating db
+        return;
+
     query = 'UPDATE Stats SET value = value + ' + str(n) + ' WHERE name = "invalid_versions"';
 
     with db_con:
