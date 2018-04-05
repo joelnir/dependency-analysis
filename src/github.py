@@ -18,7 +18,7 @@ def get_repos(min_stars, max_stars):
     page_i = 1;
 
     # Only 10 pages are available from github api
-    while (total_count//100) >= page_i and page_i < 10:
+    while ((total_count//100) + 1) >= page_i and page_i <= 10:
         log.log("Getting repos from page " + str(page_i));
         query = filled_query + "&page="+str(page_i);
 

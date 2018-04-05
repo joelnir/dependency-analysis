@@ -180,7 +180,7 @@ def analyse_projects(start_index):
     start_time = 0;
     end_time = 0;
 
-    while(run and (i <= sample_size + 13)):
+    while(run and (i <= sample_size)):
         log.log("Project " + str(i) + "/" + str(sample_size), True);
 
         start_time = time.time();
