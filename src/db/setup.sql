@@ -14,8 +14,10 @@ CREATE TABLE SampleProject (
     name varchar(255) NOT NULL,
     url varchar(255),
     stars INTEGER,
+    direct_dep INTEGER,
     indirect_dep INTEGER,
     dep_depth INTEGER,
+    direct_dep_dev INTEGER,
     indirect_dep_dev INTEGER,
     dep_depth_dev INTEGER
 );
@@ -25,23 +27,11 @@ CREATE TABLE PackageVersion (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name varchar(255) NOT NULL,
     version varchar(255),
-    indirect_dep INTEGER,
-    dep_depth INTEGER,
-    indirect_dep_dev INTEGER,
-    dep_depth_dev INTEGER
+    dep_depth INTEGER
 );
 
 -- Table of dependencies from project to npm package
 CREATE TABLE ProjectDependency (
-    project_id INTEGER,
-    package_id INTEGER,
-    PRIMARY KEY (project_id, package_id),
-    FOREIGN KEY (project_id) REFERENCES SampleProject(id),
-    FOREIGN KEY (package_id) REFERENCES PackageVersion(id)
-);
-
--- Table of dev-dependencies from project to npm package
-CREATE TABLE ProjectDevDependency (
     project_id INTEGER,
     package_id INTEGER,
     PRIMARY KEY (project_id, package_id),

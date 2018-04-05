@@ -46,20 +46,15 @@ def sample_projects():
 """
 Insert package into PackageVersion table
 package should be a dict that contains fields:
-name, version, indirect_dep, dep_depth, (indirect_dep_dev and dep_depth_dev)
+name, version
 """
-def insert_package(package):
-    base_query = "INSERT INTO PackageVersion (name, version, indirect_dep, \
-        dep_depth, indirect_dep_dev, dep_depth_dev) \
-        VALUES('{}','{}',{}, {}, {}, {})";
+def add_package(package):
+    base_query = "INSERT INTO PackageVersion (name, version) \
+        VALUES('{}','{}')";
 
     filled_query = base_query.format(
         package["name"],
         package["version"],
-        package["indirect_dep"],
-        package["dep_depth"],
-        0,
-        0 # TODO Remove these, not interesting?
     );
 
     with db_con:
@@ -68,10 +63,19 @@ def insert_package(package):
 
         return db_cur.lastrowid
 
+def update_package_depth(id, depth):
+    query = "UPDATE PackageVersion \
+        SET dep_depth = {} WHERE id = {}";
+    filled_query = query.format(depth, id);
+
+    with db_con:
+        db_cur = db_con.cursor();
+        db_cur.execute(filled_query);
+
 """
 Add dependency from project to package
 """
-def add_project_dependency(project_id, package_id, dev=False):
+def add_project_dependency(project_id, package_id, dev):
     if dev:
         table = "ProjectDevDependency"
     else:
@@ -87,14 +91,9 @@ def add_project_dependency(project_id, package_id, dev=False):
 """
 Add dependency from package to package
 """
-def add_package_dependency(dependent_id, dependency_id, dev=False):
-    if dev:
-        table = "PackageDevDependency"
-    else:
-        table = "PackageDependency"
-
-    query = "INSERT INTO {} (dependent_id, dependency_id) VALUES({}, {})";
-    filled_query = query.format(table, dependent_id, dependency_id);
+def add_package_dependency(dependent_id, dependency_id):
+    query = "INSERT INTO PackageDependency (dependent_id, dependency_id) VALUES({}, {})";
+    filled_query = query.format(dependent_id, dependency_id);
 
     with db_con:
         db_cur = db_con.cursor();
@@ -106,18 +105,21 @@ Update the SampleProject table with info about the dependency statistics for a p
 project_id is the id of the project row in the table
 
 dependency_info is a dict with the fields:
-indirect_dep, dep_depth, indirect_dep_dev and dep_depth_dev
+direct_dep, indirect_dep, dep_depth, direct_dep_dev, indirect_dep_dev and dep_depth_dev
 """
 def update_project_dependencies(project_id, dependency_info):
     query = "UPDATE SampleProject \
         SET indirect_dep = {}, dep_depth = {}, \
-        indirect_dep_dev = {}, dep_depth_dev = {} \
+        indirect_dep_dev = {}, dep_depth_dev = {}, \
+        direct_dep = {}, direct_dep_dev = {} \
         WHERE id = {}";
     filled_query = query.format(
         dependency_info["indirect_dep"],
         dependency_info["dep_depth"],
         dependency_info["indirect_dep_dev"],
         dependency_info["dep_depth_dev"],
+        dependency_info["direct_dep"],
+        dependency_info["direct_dep_dev"],
         project_id
     );
 
@@ -148,10 +150,7 @@ def get_package(name, version):
         "id": res[0],
         "name": res[1],
         "version": res[2],
-        "indirect_dep": res[3],
-        "dep_depth": res[4],
-        "indirect_dep_dev": res[5],
-        "dep_depth_dev": res[6]
+        "dep_depth": res[3],
     }
 
     return pkg;
@@ -193,10 +192,12 @@ def get_project(project_id):
         "name": res[1],
         "url": res[2],
         "stars": res[3],
-        "indirect_dep": res[4],
-        "dep_depth": res[5],
-        "indirect_dep_dev": res[6],
-        "dep_depth_dev": res[7]
+        "direct_dep": res[4],
+        "indirect_dep": res[5],
+        "dep_depth": res[6],
+        "direct_dep_dev": res[7],
+        "indirect_dep_dev": res[8],
+        "dep_depth_dev": res[9]
     }
 
     return proj;
@@ -214,3 +215,32 @@ def add_invalid(n):
     with db_con:
         db_cur = db_con.cursor();
         db_cur.execute(query);
+
+"""
+"""
+def reachable_nodes(project_id, dev):
+    query = """
+        WITH RECURSIVE
+          reachable(id) AS (
+            SELECT package_id FROM {} WHERE project_id={}
+            UNION
+            SELECT dependency_id FROM PackageDependency, reachable
+            WHERE PackageDependency.dependent_id=reachable.id
+          )
+        SELECT COUNT(*) FROM reachable;
+    """;
+
+    if(dev):
+        table_name = "ProjectDevDependency";
+    else:
+        table_name = "ProjectDependency";
+
+    filled_query = query.format(table_name, project_id);
+
+    with db_con:
+        db_cur = db_con.cursor();
+        db_cur.execute(filled_query);
+
+        res = db_cur.fetchone();
+
+    return res[0];
