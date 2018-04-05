@@ -2,6 +2,12 @@ import requests;
 import log;
 import npm;
 
+"""
+Get list of repos from github with star amount between min_stars and max_stars
+
+returns list of dicts with keys:
+name, url and stars
+"""
 def get_repos(min_stars, max_stars):
     base_query = "https://api.github.com/search/repositories?q=language:javascript+stars:{}..{}&per_page=100";
     filled_query = base_query.format(str(min_stars), str(max_stars));
@@ -35,7 +41,12 @@ def get_repos(min_stars, max_stars):
     return repos;
 
 """
+Get info about dependencies from github package.json file
+url should be on format username/projectname
 
+returns dict with keys dependencies and dev_dependencies
+These entries contain list of
+dependencies (on format from npm.decode_dependencies)
 """
 def get_project_dependencies(url):
     base_url = "https://raw.githubusercontent.com/{}/master/package.json"

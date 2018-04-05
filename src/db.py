@@ -46,7 +46,7 @@ def sample_projects():
 """
 Insert package into PackageVersion table
 package should be a dict that contains fields:
-name, version, indirect_dep, dep_depth, indirect_dep_dev and dep_depth_dev
+name, version, indirect_dep, dep_depth, (indirect_dep_dev and dep_depth_dev)
 """
 def insert_package(package):
     base_query = "INSERT INTO PackageVersion (name, version, indirect_dep, \
@@ -58,8 +58,8 @@ def insert_package(package):
         package["version"],
         package["indirect_dep"],
         package["dep_depth"],
-        package["indirect_dep_dev"],
-        package["dep_depth_dev"]
+        0,
+        0 # TODO Remove these, not interesting?
     );
 
     with db_con:
@@ -157,9 +157,9 @@ def get_package(name, version):
     return pkg;
 
 """
-Get amount of packages in sample
+Get amount of projects in sample
 """
-def get_package_count():
+def get_project_count():
     query = 'SELECT COUNT(*) FROM SampleProject';
 
     with db_con:

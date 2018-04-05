@@ -13,7 +13,12 @@ def get_dependencies(name, version, data = "dependencies"):
 
     res = spc.run(commandLine, stdout=spc.PIPE);
     json_str = res.stdout.decode("utf-8");
-    json_obj = json.loads(json_str);
+
+    if(not json_str):
+        # No dependencies
+        json_obj = {};
+    else:
+        json_obj = json.loads(json_str);
 
     return decode_dependencies(json_obj);
 
