@@ -66,3 +66,11 @@ CREATE TABLE PackageDevDependency (
     FOREIGN KEY (dependent_id) REFERENCES PackageVersion(id),
     FOREIGN KEY (dependency_id) REFERENCES PackageVersion(id)
 );
+
+-- Table with statistics gathered
+CREATE TABLE Stats (
+    name varchar(255) PRIMARY KEY,
+    value INTEGER
+);
+
+INSERT INTO Stats (name, value) VALUES ("invalid_versions", 0);

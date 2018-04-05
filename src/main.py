@@ -49,7 +49,11 @@ def get_package_info(name, version):
     dependency_info = npm.get_dependencies(name, version);
 
     npm_dependencies = dependency_info["dependencies"];
-    invalid_c = dependency_info["invalid"]; # TODO Store invalid amount
+
+    invalid_c = dependency_info["invalid"];
+    if(invalid_c > 0):
+        # Store amount of invalid versions
+        db.add_invalid(invalid_c);
 
     package_depencies = [get_package_info(pkg["name"], pkg["version"]) for pkg in npm_dependencies];
 
@@ -87,8 +91,6 @@ def main():
     db.connect_db();
 
     # Code here
-    a = get_package_info("js-yaml", "3.11.0");
-    print(a);
 
     log.close_log();
 

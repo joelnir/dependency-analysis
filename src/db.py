@@ -200,3 +200,13 @@ def get_project(project_id):
     }
 
     return proj;
+
+"""
+Add to invalid count in sql db
+"""
+def add_invalid(n):
+    query = 'UPDATE Stats SET value = value + ' + str(n) + ' WHERE name = "invalid_versions"';
+
+    with db_con:
+        db_cur = db_con.cursor();
+        db_cur.execute(query);
