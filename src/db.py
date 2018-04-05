@@ -2,7 +2,7 @@ import log;
 import sqlite3 as sqlite;
 
 DB_FILE_NAME = "db/database.db";
-SAMPLE_SIZE = 1;
+SAMPLE_SIZE = 1000;
 
 db_con = None;
 

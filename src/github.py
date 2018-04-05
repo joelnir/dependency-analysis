@@ -56,6 +56,7 @@ def get_project_dependencies(url):
 
     if(response.status_code == 404):
         # package.json file not found
+        log.log("No package.json file found for " + url);
         return False
 
     json_data = response.json();

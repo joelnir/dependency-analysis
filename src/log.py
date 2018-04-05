@@ -8,12 +8,14 @@ def init_log():
     log_file = open(FILE_NAME, "a");
     log("Reopened log");
 
-def log(msg):
+def log(msg, do_print = False):
     now = datetime.datetime.now();
     log_msg = str(now) + ": " + msg;
 
     log_file.write(log_msg + "\n");
-    print(log_msg);
+
+    if(do_print):
+        print(log_msg);
 
 def close_log():
     log("Closing log");

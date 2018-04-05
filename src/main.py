@@ -2,6 +2,9 @@ import log;
 import github;
 import db;
 import npm;
+import signal;
+import time;
+import datetime;
 
 # Functions to use if imported as module
 """
@@ -86,12 +89,20 @@ def get_package_info(name, version):
 
     return pkg_info;
 
+"""
+Run complete analysis of project at id and update database
+"""
 def analyse_single_project(id):
     project = db.get_project(id);
 
-    log.log("Analysing project: " + project["name"]);
+    log.log("Analysing project: " + project["name"], True);
 
     project_dep = github.get_project_dependencies(project["url"]);
+
+    if(not project_dep):
+        # No project.json file found
+        return; # TODO Note this
+
     dependency_info = project_dep["dependencies"];
     dependency_info_dev = project_dep["dev_dependencies"];
 
@@ -147,16 +158,51 @@ def analyse_single_project(id):
     complete_dependencies["indirect_dep_dev"] = db.reachable_nodes(id, True);
 
     # Update db
-    db.update_project_dependencies(id, complete_dependencies); # TODO FIX
+    db.update_project_dependencies(id, complete_dependencies);
+
+# Decides if shoudl keep running
+run = True;
+
+def catch_int(signal, frame):
+    global run;
+
+    log.log("Keyboard interrupt recieved", True);
+    run = False;
 
 def analyse_projects(start_index):
-    pass
+    global run;
+
+    signal.signal(signal.SIGINT, catch_int);
+    sample_size = db.get_project_count();
+
+    i = start_index;
+
+    start_time = 0;
+    end_time = 0;
+
+    while(run and (i <= sample_size + 13)):
+        log.log("Project " + str(i) + "/" + str(sample_size), True);
+
+        start_time = time.time();
+        analyse_single_project(i);
+        end_time = time.time();
+
+        human_uptime = str(datetime.timedelta(seconds=int(end_time-start_time)));
+        log.log("Analysis took " + human_uptime, True);
+
+        i += 1;
+
+    if(not run):
+        log.log("Exiting from keyboard interrupt after index " + str(i-1), True);
+
+    return;
 
 def main():
     log.init_log();
     db.connect_db();
 
     # Code here
+    analyse_projects(1);
 
     log.close_log();
 

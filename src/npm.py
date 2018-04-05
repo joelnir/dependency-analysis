@@ -74,6 +74,9 @@ def decode_version(name, ver_str):
     if(isinstance(json_obj, str)):
         # If only one mathcing version json_obj will be str
         version = json_obj;
+    elif(isinstance(json_obj, dict)):
+        # Error in finding package
+        return False;
     else:
         version = json_obj[-1];
 
