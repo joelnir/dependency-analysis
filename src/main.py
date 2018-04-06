@@ -7,6 +7,7 @@ import time;
 import datetime;
 
 # Functions to use if imported as module
+
 """
 Download repos to the Projects table.
 The repos are taken from javascript repos between min and max stars
@@ -28,6 +29,12 @@ def download_repos(min_stars, max_stars):
     log.log("Repos saved in database");
 
     log.close_log();
+
+"""
+Sample n random repos from Project to SampleProject
+"""
+def sample_repos(n):
+    db.sample_projects(n);
 
 """
 Returns dict with (at least) fields:
@@ -160,15 +167,21 @@ def analyse_single_project(id):
     # Update db
     db.update_project_dependencies(id, complete_dependencies);
 
-# Decides if shoudl keep running
+# Decides if should keep running
 run = True;
 
+"""
+Catch the interrupt from keyboard to kill analysis after next project analysed
+"""
 def catch_int(signal, frame):
     global run;
 
     log.log("Keyboard interrupt recieved", True);
     run = False;
 
+"""
+Analyse the projects from the SampleProjects table
+"""
 def analyse_projects(start_index):
     global run;
 
@@ -192,7 +205,9 @@ def analyse_projects(start_index):
 
         i += 1;
 
-    if(not run):
+    if(run):
+        log.log("All projects analysed!", True);
+    else:
         log.log("Exiting from keyboard interrupt after index " + str(i-1), True);
 
     return;

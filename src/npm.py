@@ -7,9 +7,9 @@ Get info about dependencies for a package name and version
 
 returns dict on same format as decode_dependencies
 """
-def get_dependencies(name, version, data = "dependencies"):
+def get_dependencies(name, version):
     # Split at every space on command line
-    commandLine = ["npm", "view", name + "@" + version, data, "--json"];
+    commandLine = ["npm", "view", name + "@" + version, "dependencies", "--json"];
 
     res = spc.run(commandLine, stdout=spc.PIPE);
     json_str = res.stdout.decode("utf-8");
@@ -77,10 +77,8 @@ def decode_version(name, ver_str):
     elif(isinstance(json_obj, dict)):
         # Error in finding package
         return False;
+        log.log("Error when looking up npm package "+name+" "+ver_str);
     else:
         version = json_obj[-1];
 
     return version;
-
-def get_dev_dependencies(name, version):
-    return get_dependencies(name, version, devDependencies);

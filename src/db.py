@@ -2,7 +2,6 @@ import log;
 import sqlite3 as sqlite;
 
 DB_FILE_NAME = "db/database.db";
-SAMPLE_SIZE = 1000;
 
 db_con = None;
 
@@ -34,10 +33,10 @@ def insert_project(project):
         return db_cur.lastrowid
 
 """
-Move SAMPLE_SIZE rows from Project to SampleProject
+Move n random rows from Project to SampleProject
 """
-def sample_projects():
-    rand_query = "INSERT INTO SampleProject (name, url, stars) SELECT name, url, stars FROM Project ORDER BY RANDOM() LIMIT " + str(SAMPLE_SIZE) + ";";
+def sample_projects(n):
+    rand_query = "INSERT INTO SampleProject (name, url, stars) SELECT name, url, stars FROM Project ORDER BY RANDOM() LIMIT " + str(n) + ";";
 
     with db_con:
         db_cur = db_con.cursor();
@@ -63,6 +62,9 @@ def add_package(package):
 
         return db_cur.lastrowid
 
+"""
+Set the package depth for project with given id
+"""
 def update_package_depth(id, depth):
     query = "UPDATE PackageVersion \
         SET dep_depth = {} WHERE id = {}";
@@ -217,6 +219,10 @@ def add_invalid(n):
         db_cur.execute(query);
 
 """
+Get count of reachable packages from project
+
+If dev is true packages reachable from devDependencies are counted
+else from dependencies.
 """
 def reachable_nodes(project_id, dev):
     query = """
