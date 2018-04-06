@@ -34,7 +34,12 @@ def download_repos(min_stars, max_stars):
 Sample n random repos from Project to SampleProject
 """
 def sample_repos(n):
+    log.init_log();
+    db.connect_db();
+
     db.sample_projects(n);
+
+    log.close_log();
 
 """
 Returns dict with (at least) fields:
