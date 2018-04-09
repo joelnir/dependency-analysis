@@ -42,6 +42,10 @@ def decode_dependencies(json_dict):
         "invalid": 0 # Amount of invalid version lookups
     }
 
+    # Safeguard against people using empty lists instead of dicts
+    if (not json_dict):
+        return dependency_info;
+
     for name in json_dict.keys():
         decoded_ver = decode_version(name, json_dict[name]);
 

@@ -59,7 +59,11 @@ def get_project_dependencies(url):
         log.log("No package.json file found for " + url);
         return False
 
-    json_data = response.json();
+    try:
+        json_data = response.json();
+    except:
+        log.log("Failed to read json for " + url, True);
+        return False
 
     if("dependencies" in json_data):
         deps = json_data["dependencies"];
