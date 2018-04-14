@@ -5,6 +5,7 @@ import npm
 import signal
 import time
 import datetime
+import plots
 
 # Functions to use if imported as module
 
@@ -222,7 +223,7 @@ def main():
     db.connect_db()
 
     # Code here
-    analyse_projects(1)
+    plots.create_all_histograms();
 
     log.close_log()
 

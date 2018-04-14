@@ -1,4 +1,3 @@
-import log
 import sqlite3 as sqlite
 
 DB_FILE_NAME = "db/database.db"
@@ -250,3 +249,19 @@ def reachable_nodes(project_id, dev):
         res = db_cur.fetchone()
 
     return res[0]
+
+"""
+Get all values from a specific field of SampleProject tables as a list
+"""
+def get_values(field):
+    base_query = 'SELECT {} FROM SampleProject WHERE {} IS NOT NULL';
+    filled_query = base_query.format(field, field);
+
+    with db_con:
+        db_cur = db_con.cursor()
+        db_cur.execute(filled_query)
+
+        res = db_cur.fetchall()
+
+    res = [x[0] for x in res]
+    return res
