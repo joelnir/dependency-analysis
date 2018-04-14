@@ -20,8 +20,8 @@ def get_standard_deviation(field):
 Create one set of histograms
 """
 def create_all_histograms():
-    make_histogram('dep_depth', 'Beroendedjup', 0, 24, 1, 1)
-    make_histogram('dep_depth_dev', 'Beroendedjup', 0, 24, 1, 1)
+    make_histogram('dep_depth', 'Beroendedjup', 0, 25, 1, 1)
+    make_histogram('dep_depth_dev', 'Beroendedjup', 0, 25, 1, 1)
     make_histogram('direct_dep', 'Direkta Beroenden', 0, 50, 2, 2)
     make_histogram('direct_dep_dev', 'Direkta Beroenden', 0, 50, 2, 2)
     make_histogram('indirect_dep', 'Indirekta Beroenden', 0, 2000, 50, 100)
